@@ -56,6 +56,7 @@ export const App = () => {
         total={totalFeedback}
         positive={positiveFeedback}
       />
+      {totalFeedback === 0 && <Notification />}
     </>
   );
 };
