@@ -1,21 +1,24 @@
 import css from "./Options.module.css";
 
-export const Options = ({ handleClick, options }) => {
+export const Options = ({
+  handelGood,
+  handelBad,
+  handelNeutral,
+  total,
+  handleReset,
+}) => {
   return (
     <ul className={css.btList}>
-      {options.map((option) => (
-        <li
-          key={option}
-          className={css.bt}
-        >
-          <button
-            type="button"
-            onClick={() => handleClick(option)}
-          >
-            {option}
-          </button>
-        </li>
-      ))}
+      <li>
+        <button onClick={handelGood}>Good</button>
+      </li>
+      <li>
+        <button onClick={handelNeutral}>Neutral</button>
+      </li>
+      <li>
+        <button onClick={handelBad}>Bad</button>
+      </li>
+      <li>{total !== 0 && <button onClick={handleReset}>Reset</button>}</li>
     </ul>
   );
 };

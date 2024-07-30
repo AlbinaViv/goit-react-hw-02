@@ -1,79 +1,61 @@
-import css from "./App.module.css";
 import { useEffect, useState } from "react";
 import { Discription } from "../Discription/Discription";
-import { Feedback } from "../Feedback/Feedback";
+// import css from "./App.module.css";
 import { Options } from "../Options/Options";
-import { Notification } from "../Notification/Notification";
+import { Feedback } from "../Feedback/Feedback";
 
 export const App = () => {
-  const initState = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+  const [reviews, setReviews] = useState(() => {
+    const savedClicks = window.localStorage.getItem("saved-clicks");
+    if (savedClicks !== null) {
+      return JSON.parse(savedClicks);
+    }
+    return {
+      good: 0,
+      neutral: 0,
+      bad: 0,
+    };
+  });
+  useEffect(() => {
+    window.localStorage.setItem("saved-clicks", JSON.stringify(reviews));
+  }, [reviews]);
+
+  const handelGood = () => {
+    setReviews({ ...reviews, good: reviews.good + 1 });
   };
 
-  // const [state, setState] = useState(() => {
-  //   const savedFeedback = window.localStorage.getItem("feedback");
-  //   if (savedFeedback !== null) {
-  //     return JSON.parse(savedFeedback);
-  //   }
-  //   return initState;
-  // });
+  const handelBad = () => {
+    setReviews({ ...reviews, bad: reviews.bad + 1 });
+  };
 
-  const [state, setState] = useState(
-    () => JSON.parse(window.localStorage.getItem("feedback")) ?? initState
-  );
-
-  const { good, neutral, bad } = state;
-  const total = good + neutral + bad;
-  const positive = Math.round(((good + neutral) / total) * 100);
-
-  const handleClick = (name) => {
-    setState((prev) => ({
-      ...prev,
-      [name]: prev[name] + 1,
-    }));
+  const handelNeutral = () => {
+    setReviews({ ...reviews, neutral: reviews.neutral + 1 });
   };
 
   const handleReset = () => {
-    setState(initState);
+    setReviews({ good: 0, neutral: 0, bad: 0 });
   };
 
-  useEffect(() => {
-    window.localStorage.setItem("feedback", JSON.stringify(state));
-  }, [state]);
+  const totalFeedback = reviews.good + reviews.neutral + reviews.bad;
+  const positiveFeedback = Math.round((reviews.good / totalFeedback) * 100);
+
   return (
     <>
       <Discription />
-
-      <div className={css.wrap}>
-        <Options
-          handleClick={handleClick}
-          options={Object.keys(initState)}
-        />
-
-        {total > 0 && (
-          <button
-            type="button"
-            onClick={handleReset}
-          >
-            Reset
-          </button>
-        )}
-      </div>
-
-      {total > 0 ? (
-        <Feedback
-          good={good}
-          neutral={neutral}
-          bad={bad}
-          total={total}
-          positive={positive}
-          // options={[...state, total, positive]}
-        />
-      ) : (
-        <Notification />
-      )}
+      <Options
+        handelGood={handelGood}
+        handelBad={handelBad}
+        handelNeutral={handelNeutral}
+        total={totalFeedback}
+        handleReset={handleReset}
+      />
+      <Feedback
+        good={reviews.good}
+        neutral={reviews.neutral}
+        bad={reviews.bad}
+        total={totalFeedback}
+        positive={positiveFeedback}
+      />
     </>
   );
 };
